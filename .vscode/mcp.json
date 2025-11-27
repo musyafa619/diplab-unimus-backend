@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "MongoDB": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb+srv://nopidekha_db_user:BNf3LAJ4jxnqKJgQ@cluster0.i4mboxf.mongodb.net/diplab-unimus?appName=Cluster0",
+        "MDB_MCP_API_CLIENT_ID": "",
+        "MDB_MCP_API_CLIENT_SECRET": ""
+      }
+    }
+  },
+  "inputs": []
+}

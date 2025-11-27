@@ -1,0 +1,242 @@
+{
+  "info": {
+    "name": "diblab-unimus-backend",
+    "_postman_id": "dab1f8d2-0000-4000-8000-000000000000",
+    "description": "Postman collection for diblab-unimus-backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admins",
+      "item": [
+        {
+          "name": "Create Admin - POST /api/admins",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin1\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admins"]
+            }
+          }
+        },
+        {
+          "name": "Login - POST /api/admins/login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin1\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admins/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admins", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// extract token from Set-Cookie header and save to environment variable 'token'",
+                  "const sc = pm.response.headers.get('set-cookie');",
+                  "if (sc) {",
+                  "  const m = sc.match(/token=([^;]+);?/);",
+                  "  if (m) {",
+                  "    pm.environment.set('token', m[1]);",
+                  "    console.log('token saved to environment');",
+                  "  }",
+                  "}",
+                  "pm.test('status is 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Me - GET /api/admins/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admins/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admins", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout - POST /api/admins/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admins/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admins", "logout"]
+            }
+          }
+        },
+        {
+          "name": "List Admins - GET /api/admins",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admins",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admins"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "Create Item - POST /api/items (multipart/form-data)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Oscilloscope", "type": "text" },
+                { "key": "quantity", "value": "2", "type": "text" },
+                { "key": "image", "type": "file", "src": "/path/to/osc.png" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"]
+            }
+          }
+        },
+        {
+          "name": "List Items - GET /api/items",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items"]
+            }
+          }
+        },
+        {
+          "name": "Get Item - GET /api/items/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Item - PUT /api/items/:id (multipart/form-data)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Oscilloscope Updated",
+                  "type": "text"
+                },
+                { "key": "quantity", "value": "3", "type": "text" },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/path/to/osc-updated.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Item - DELETE /api/items/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Cookie", "value": "token={{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/items/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
