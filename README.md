@@ -1,6 +1,6 @@
-# diblab-unimus-backend
+# Diplab Unimus Backend
 
-Minimal Node + Express backend scaffold using TypeScript.
+Minimal Node + Express backend using TypeScript.
 
 ## Setup
 
@@ -56,9 +56,3 @@ cp .env.example .env
 - `src/routes` — express route definitions.
 - `src/controllers` — controllers/handlers.
 - `src/middleware` — express middleware (error handler).
-
-## Next steps (suggested)
-
-- Add ESLint config and run `npm run lint`.
-- Add unit tests (Jest + ts-jest) and export `app` for testing.
-- Add Dockerfile and CI/CD pipeline.
