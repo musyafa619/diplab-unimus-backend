@@ -1,11 +1,10 @@
+// Load environment variables before importing any modules that depend on them
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { connectDB } from './config/db';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-
-dotenv.config();
 
 const app = express();
 

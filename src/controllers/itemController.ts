@@ -39,9 +39,9 @@ export async function createItem(req: Request, res: Response) {
 
 export async function listItems(req: Request, res: Response) {
   try {
-    const items = await Item.find().sort({ id: 1 }).lean();
+    const items = await Item.find().sort({ createdAt: 1 }).lean();
     const out = items.map((i) => {
-      const { __v, _id, ...rest } = i as any;
+      const { __v, ...rest } = i as any;
       return rest;
     });
     return res.json(out);
@@ -55,12 +55,10 @@ export async function listItems(req: Request, res: Response) {
 export async function getItemById(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const numId = Number(id);
-    if (Number.isNaN(numId))
-      return res.status(400).json({ error: 'invalid id' });
-    const item = await Item.findOne({ id: numId }).lean();
+    // `id` is a MongoDB ObjectId string now
+    const item = await Item.findById(id).lean();
     if (!item) return res.status(404).json({ error: 'not found' });
-    const { __v, _id, ...rest } = item as any;
+    const { __v, ...rest } = item as any;
     return res.json(rest);
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -72,10 +70,6 @@ export async function getItemById(req: Request, res: Response) {
 export async function updateItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const numId = Number(id);
-    if (Number.isNaN(numId))
-      return res.status(400).json({ error: 'invalid id' });
-
     const { name, quantity } = req.body;
     const update: any = {};
     if (name !== undefined) update.name = name;
@@ -97,13 +91,13 @@ export async function updateItem(req: Request, res: Response) {
       }
     }
 
-    const updated = await Item.findOneAndUpdate(
-      { id: numId },
+    const updated = await Item.findByIdAndUpdate(
+      id,
       { $set: update },
       { new: true }
     ).lean();
     if (!updated) return res.status(404).json({ error: 'not found' });
-    const { __v, _id, ...rest } = updated as any;
+    const { __v, ...rest } = updated as any;
     return res.json(rest);
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -115,12 +109,9 @@ export async function updateItem(req: Request, res: Response) {
 export async function deleteItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const numId = Number(id);
-    if (Number.isNaN(numId))
-      return res.status(400).json({ error: 'invalid id' });
-    const removed = await Item.findOneAndDelete({ id: numId }).lean();
+    const removed = await Item.findByIdAndDelete(id).lean();
     if (!removed) return res.status(404).json({ error: 'not found' });
-    const { __v, _id, ...rest } = removed as any;
+    const { __v, ...rest } = removed as any;
     return res.json(rest);
   } catch (err) {
     // eslint-disable-next-line no-console

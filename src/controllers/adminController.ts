@@ -110,6 +110,7 @@ export async function login(req: Request, res: Response) {
     };
 
     res.cookie('token', token, cookieOpts);
+
     return res.json({ ok: true });
   } catch (err) {
     // eslint-disable-next-line no-console

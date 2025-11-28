@@ -13,7 +13,11 @@ import { authMiddleware } from '../middleware/auth';
 const router = Router();
 
 // multer that stores uploads temporarily in OS temp dir
-const upload = multer({ dest: os.tmpdir() });
+// limit file uploads to 5 MB
+const upload = multer({
+  dest: os.tmpdir(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+});
 
 // protect all item routes
 router.use(authMiddleware);
