@@ -12,7 +12,22 @@
       "type": "string"
     },
     {
-      "key": "token",
+      "key": "itemId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "majorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookingId",
       "value": "",
       "type": "string"
     }
@@ -39,7 +54,7 @@
       "name": "Admins",
       "item": [
         {
-          "name": "Create Admin - POST /api/admins",
+          "name": "Create Admin - POST /api/admin/create",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -48,14 +63,14 @@
               "raw": "{\n  \"username\": \"admin1\",\n  \"password\": \"secret123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/admins",
+              "raw": "{{baseUrl}}/api/admin/create",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admins"]
+              "path": ["api", "admin", "create"]
             }
           }
         },
         {
-          "name": "Login - POST /api/admins/login",
+          "name": "Login - POST /api/admin/login",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -64,9 +79,9 @@
               "raw": "{\n  \"username\": \"admin1\",\n  \"password\": \"secret123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/admins/login",
+              "raw": "{{baseUrl}}/api/admin/login",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admins", "login"]
+              "path": ["api", "admin", "login"]
             }
           },
           "event": [
@@ -74,15 +89,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// extract token from Set-Cookie header and save to environment variable 'token'",
-                  "const sc = pm.response.headers.get('set-cookie');",
-                  "if (sc) {",
-                  "  const m = sc.match(/token=([^;]+);?/);",
-                  "  if (m) {",
-                  "    pm.environment.set('token', m[1]);",
-                  "    console.log('token saved to environment');",
-                  "  }",
-                  "}",
                   "pm.test('status is 200', function () { pm.response.to.have.status(200); });"
                 ],
                 "type": "text/javascript"
@@ -91,44 +97,38 @@
           ]
         },
         {
-          "name": "Get Me - GET /api/admins/me",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/admins/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admins", "me"]
-            }
-          }
-        },
-        {
-          "name": "Logout - POST /api/admins/logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/admins/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admins", "logout"]
-            }
-          }
-        },
-        {
-          "name": "List Admins - GET /api/admins",
+          "name": "Get Me - GET /api/admin/me",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/admins",
+              "raw": "{{baseUrl}}/api/admin/me",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admins"]
+              "path": ["api", "admin", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout - POST /api/admin/logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Get Admin - GET /api/admin/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "{{itemId}}"]
             }
           }
         }
@@ -138,13 +138,10 @@
       "name": "Items",
       "item": [
         {
-          "name": "Create Item - POST /api/items (multipart/form-data)",
+          "name": "Create Item - POST /api/admin/items (multipart/form-data)",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -154,50 +151,45 @@
               ]
             },
             "url": {
-              "raw": "{{baseUrl}}/api/items",
+              "raw": "{{baseUrl}}/api/admin/items",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "items"]
+              "path": ["api", "admin", "items"]
             }
           }
         },
         {
-          "name": "List Items - GET /api/items",
+          "name": "List Items - GET /api/admin/items (with pagination)",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/items",
+              "raw": "{{baseUrl}}/api/admin/items?page=1&limit=10",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "items"]
+              "path": ["api", "admin", "items"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
             }
           }
         },
         {
-          "name": "Get Item - GET /api/items/:id",
+          "name": "Get Item - GET /api/admin/items/:id",
           "request": {
             "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/items/1",
+              "raw": "{{baseUrl}}/api/admin/items/{{itemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "items", "1"]
+              "path": ["api", "admin", "items", "{{itemId}}"]
             }
           }
         },
         {
-          "name": "Update Item - PUT /api/items/:id (multipart/form-data)",
+          "name": "Update Item - PUT /api/admin/items/:id (multipart/form-data)",
           "request": {
             "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -215,24 +207,252 @@
               ]
             },
             "url": {
-              "raw": "{{baseUrl}}/api/items/1",
+              "raw": "{{baseUrl}}/api/admin/items/{{itemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "items", "1"]
+              "path": ["api", "admin", "items", "{{itemId}}"]
             }
           }
         },
         {
-          "name": "Delete Item - DELETE /api/items/:id",
+          "name": "Delete Item - DELETE /api/admin/items/:id",
           "request": {
             "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Cookie", "value": "token={{token}}" }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/items/1",
+              "raw": "{{baseUrl}}/api/admin/items/{{itemId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "items", "1"]
+              "path": ["api", "admin", "items", "{{itemId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Majors",
+      "item": [
+        {
+          "name": "Create Major - POST /api/admin/majors",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/majors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "majors"]
+            }
+          }
+        },
+        {
+          "name": "List Majors - GET /api/admin/majors (with pagination)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/majors?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "majors"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Major - GET /api/admin/majors/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/majors/{{majorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "majors", "{{majorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Major - PUT /api/admin/majors/:id",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Major Name\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/majors/{{majorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "majors", "{{majorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Major - DELETE /api/admin/majors/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/majors/{{majorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "majors", "{{majorId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Create Student - POST /api/admin/students",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"nim\": \"12345678\",\n  \"majorId\": \"{{majorId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "students"]
+            }
+          }
+        },
+        {
+          "name": "List Students - GET /api/admin/students (with pagination)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "students"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student - GET /api/admin/students/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Student - PUT /api/admin/students/:id",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"nim\": \"87654321\",\n  \"majorId\": \"{{majorId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student - DELETE /api/admin/students/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "students", "{{studentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking - POST /api/admin/bookings",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"items\": [\"{{itemId}}\"],\n  \"start_date\": \"2025-12-01\",\n  \"end_date\": \"2025-12-02\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "List Bookings - GET /api/admin/bookings (with pagination)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Booking - GET /api/admin/bookings/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Booking - PUT /api/admin/bookings/:id",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"items\": [\"{{itemId}}\"],\n  \"start_date\": \"2025-12-03\",\n  \"end_date\": \"2025-12-04\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Booking - DELETE /api/admin/bookings/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bookings", "{{bookingId}}"]
             }
           }
         }

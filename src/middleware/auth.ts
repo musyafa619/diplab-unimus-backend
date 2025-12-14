@@ -34,6 +34,8 @@ export async function authMiddleware(
     // cast admin to any to avoid lean() type mismatches from mongoose typings
     const a: any = admin;
     req.user = { id: a._id.toString(), username: a.username };
+
+    console.log('qqqqq');
     next();
   } catch (err) {
     // eslint-disable-next-line no-console

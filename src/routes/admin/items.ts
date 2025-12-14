@@ -3,12 +3,13 @@ import os from 'os';
 import multer from 'multer';
 import {
   createItem,
-  listItems,
+  getListItems,
   getItemById,
   updateItem,
   deleteItem,
-} from '../controllers/itemController';
-import { authMiddleware } from '../middleware/auth';
+} from '../../controllers/itemController';
+import { authMiddleware } from '../../middleware/auth';
+import { get } from 'https';
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.use(authMiddleware);
 router.post('/', upload.single('image'), createItem);
 
 // GET /api/items
-router.get('/', listItems);
+router.get('/', getListItems);
 
 // GET /api/items/:id
 router.get('/:id', getItemById);

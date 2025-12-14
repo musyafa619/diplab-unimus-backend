@@ -37,51 +37,6 @@ export async function createAdmin(req: Request, res: Response) {
   }
 }
 
-export async function listAdmins(req: Request, res: Response) {
-  try {
-    const admins = await Admin.find().lean();
-    const out = admins.map((a) => {
-      // remove password before sending
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = a as any;
-      return rest;
-    });
-    return res.json(out);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
-
-export async function getAdminById(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const admin = await Admin.findById(id).lean();
-    if (!admin) return res.status(404).json({ error: 'not found' });
-    const { password, ...rest } = admin as any;
-    return res.json(rest);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
-
-export async function deleteAdmin(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    const result = await Admin.findByIdAndDelete(id).lean();
-    if (!result) return res.status(404).json({ error: 'not found' });
-    const { password, ...rest } = result as any;
-    return res.json(rest);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
-
 export async function login(req: Request, res: Response) {
   try {
     const { username, password } = req.body;
@@ -104,8 +59,16 @@ export async function login(req: Request, res: Response) {
 
     const cookieOpts: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      // If the frontend origin is using HTTPS and you want cross-site cookies,
+      // set FRONTEND_ORIGIN to an https:// origin and the code below will
+      // use `sameSite: 'none'` and `secure: true` so browsers accept the cookie.
+      // For local HTTP development (http://localhost:3039) we keep `sameSite: 'lax'`.
+      secure:
+        process.env.FRONTEND_ORIGIN?.startsWith('https://') ||
+        process.env.NODE_ENV === 'production',
+      sameSite: process.env.FRONTEND_ORIGIN?.startsWith('https://')
+        ? 'none'
+        : 'lax',
       maxAge: 1000 * 60 * 60, // 1 hour (matches default JWT_EXPIRES)
     };
 

@@ -1,23 +1,20 @@
 import { Router } from 'express';
 import { healthCheck } from '../controllers/healthController';
-import adminsRouter from './admins';
-import itemsRouter from './items';
+import adminsRouter from './admin/admins';
+import itemsRouter from './admin/items';
+import majorsRouter from './admin/majors';
+import studentsRouter from './admin/students';
+import bookingsRouter from './admin/bookings';
 
 const router = Router();
 
 router.get('/health', healthCheck);
 
-router.use('/admins', adminsRouter);
-router.use('/items', itemsRouter);
-
-// Dev-only debug endpoint to inspect incoming cookies and headers
-if (process.env.NODE_ENV !== 'production') {
-  router.get('/debug/cookies', (req, res) => {
-    return res.json({
-      headersCookie: req.headers.cookie || null,
-      parsedCookies: req.cookies || null,
-    });
-  });
-}
+// Mount all management routes under /admin so final paths are /api/admin/...
+router.use('/admin', adminsRouter);
+router.use('/admin/items', itemsRouter);
+router.use('/admin/majors', majorsRouter);
+router.use('/admin/students', studentsRouter);
+router.use('/admin/bookings', bookingsRouter);
 
 export default router;
