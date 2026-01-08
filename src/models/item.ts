@@ -2,7 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IItem extends Document {
   name: string;
-  quantity: number;
+  description: string;
+  stock: number;
   imageUrl?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -11,7 +12,8 @@ export interface IItem extends Document {
 const ItemSchema: Schema = new Schema<IItem>(
   {
     name: { type: String, required: true },
-    quantity: { type: Number, required: true, default: 1 },
+    description: { type: String, required: true },
+    stock: { type: Number, required: true, default: 1 },
     imageUrl: { type: String },
   },
   { timestamps: true }

@@ -2,19 +2,33 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IBooking extends Document {
   studentId: Types.ObjectId;
-  items: Types.ObjectId[];
-  start_date: Date;
-  end_date: Date;
+  items: Array<{ id: Types.ObjectId; quantity: number }>;
+  note: string;
+  startDate: Date;
+  endDate: Date;
   createdAt: Date;
   updatedAt: Date;
+  status: 'pending' | 'approved' | 'rejected' | 'finished';
 }
 
 const BookingSchema: Schema = new Schema<IBooking>(
   {
     studentId: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
-    items: [{ type: Schema.Types.ObjectId, ref: 'Item' }],
-    start_date: { type: Date, required: true },
-    end_date: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'finished'],
+      default: 'pending',
+    },
+    items: [
+      {
+        _id: false,
+        id: { type: Schema.Types.ObjectId, ref: 'Item', required: true },
+        quantity: { type: Number, required: true, default: 1 },
+      },
+    ],
+    startDate: { type: Date, required: true },
+    note: { type: String, required: false, default: null },
+    endDate: { type: Date, required: true },
   },
   { timestamps: true }
 );

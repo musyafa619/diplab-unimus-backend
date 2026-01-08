@@ -6,9 +6,12 @@ import { errorHandler } from './middleware/errorHandler';
 import { connectDB } from './config/db';
 import cookieParser from 'cookie-parser';
 
-// Simple CORS middleware to allow requests from the React dev server
-// Use FRONTEND_ORIGIN env var to allow a custom origin (defaults to http://localhost:3039)
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3039';
+// Simple CORS middleware to allow requests from multiple origins
+// Use FRONTEND_ORIGINS env var (comma-separated) to allow multiple origins
+// Defaults to http://localhost:3039
+const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim());
 
 const app = express();
 
@@ -16,10 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Enable CORS for the frontend dev origin and allow credentials (cookies)
+// Enable CORS for allowed frontend origins and allow credentials (cookies)
 app.use((req, res, next) => {
   const origin = req.headers.origin as string | undefined;
-  if (origin && origin === FRONTEND_ORIGIN) {
+  if (origin && FRONTEND_ORIGINS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');

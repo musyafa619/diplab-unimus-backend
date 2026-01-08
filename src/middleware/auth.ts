@@ -35,7 +35,6 @@ export async function authMiddleware(
     const a: any = admin;
     req.user = { id: a._id.toString(), username: a.username };
 
-    console.log('qqqqq');
     next();
   } catch (err) {
     // eslint-disable-next-line no-console

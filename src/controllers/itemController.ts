@@ -5,9 +5,12 @@ import cloudinary from '../config/cloudinary';
 
 export async function createItem(req: Request, res: Response) {
   try {
-    const { name, quantity } = req.body;
+    const { name, stock, description } = req.body;
     if (!name) return res.status(400).json({ error: 'name is required' });
-    const qty = typeof quantity === 'number' ? quantity : Number(quantity || 0);
+    if (!description)
+      return res.status(400).json({ error: 'description is required' });
+
+    const newStock = typeof stock === 'number' ? stock : Number(stock || 0);
 
     let imageUrl: string | undefined = undefined;
     const file = (req as any).file;
@@ -26,7 +29,7 @@ export async function createItem(req: Request, res: Response) {
       }
     }
 
-    await Item.create({ name, quantity: qty, imageUrl });
+    await Item.create({ name, stock: newStock, imageUrl, description });
 
     return res.status(201).json({
       success: true,
@@ -56,7 +59,7 @@ export async function getListItems(req: Request, res: Response) {
 
     // Sorting
     // supported sort fields to avoid arbitrary field injection
-    const allowedSortFields = ['name', 'quantity', 'updatedAt'];
+    const allowedSortFields = ['name', 'stock', 'updatedAt'];
     const rawSortBy =
       typeof req.query.sortBy === 'string' ? req.query.sortBy.trim() : '';
     const sortBy = allowedSortFields.includes(rawSortBy)
@@ -111,10 +114,11 @@ export async function getItemById(req: Request, res: Response) {
 export async function updateItem(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const { name, quantity } = req.body;
+    const { name, stock, description } = req.body;
     const update: any = {};
     if (name !== undefined) update.name = name;
-    if (quantity !== undefined) update.quantity = Number(quantity);
+    if (description !== undefined) update.description = description;
+    if (stock !== undefined) update.stock = Number(stock);
 
     const file = (req as any).file;
     if (file && file.path) {
@@ -138,8 +142,11 @@ export async function updateItem(req: Request, res: Response) {
       { new: true }
     ).lean();
     if (!updated) return res.status(404).json({ error: 'not found' });
-    const { __v, ...rest } = updated as any;
-    return res.json(rest);
+
+    return res.json({
+      success: true,
+      message: 'Item update successfully',
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
@@ -152,8 +159,11 @@ export async function deleteItem(req: Request, res: Response) {
     const { id } = req.params;
     const removed = await Item.findByIdAndDelete(id).lean();
     if (!removed) return res.status(404).json({ error: 'not found' });
-    const { __v, ...rest } = removed as any;
-    return res.json(rest);
+
+    return res.json({
+      success: true,
+      message: 'Item deleted successfully',
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);

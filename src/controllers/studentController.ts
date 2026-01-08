@@ -14,16 +14,17 @@ export async function createStudent(req: Request, res: Response) {
     const major = await Major.findById(majorId).lean();
     if (!major) return res.status(400).json({ error: 'invalid majorId' });
 
-    const student = await Student.create({
+    await Student.create({
       name,
       nim,
       phoneNumber,
       email,
       majorId,
     });
-    const out = student.toObject();
-    delete (out as any).__v;
-    return res.status(201).json(out);
+    return res.status(201).json({
+      success: true,
+      message: 'Student created successfully',
+    });
   } catch (err: any) {
     // eslint-disable-next-line no-console
     console.error(err);
@@ -36,18 +37,44 @@ export async function createStudent(req: Request, res: Response) {
 
 export async function listStudents(req: Request, res: Response) {
   try {
+    const search =
+      typeof req.query.search === 'string' ? req.query.search.trim() : '';
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Number(req.query.limit) || 20);
     const skip = (page - 1) * limit;
 
+    const filter: any = {};
+    if (search) {
+      // partial, case-insensitive match on `name`
+      filter.name = { $regex: search, $options: 'i' };
+    }
+
+    // Sorting
+    // supported sort fields to avoid arbitrary field injection
+    const allowedSortFields = ['name', 'nim', 'email', 'updatedAt'];
+    const rawSortBy =
+      typeof req.query.sortBy === 'string' ? req.query.sortBy.trim() : '';
+    const sortBy = allowedSortFields.includes(rawSortBy)
+      ? rawSortBy
+      : 'updatedAt';
+    const rawOrder =
+      typeof req.query.orderBy === 'string'
+        ? req.query.orderBy.trim().toLowerCase()
+        : 'asc';
+    const order = rawOrder === 'desc' ? -1 : 1;
+
     const [total, students] = await Promise.all([
       Student.countDocuments({}).exec(),
-      Student.find().sort({ createdAt: 1 }).skip(skip).limit(limit).lean(),
+      Student.find(filter)
+        .sort({ [sortBy]: order })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
     ]);
 
     const out = students.map((s) => {
-      const { __v, ...rest } = s as any;
-      return rest;
+      const { __v, _id, ...rest } = s as any;
+      return { ...rest, id: _id.toString() };
     });
 
     return res.json({
@@ -66,8 +93,8 @@ export async function getStudentById(req: Request, res: Response) {
     const { id } = req.params;
     const student = await Student.findById(id).lean();
     if (!student) return res.status(404).json({ error: 'not found' });
-    const { __v, ...rest } = student as any;
-    return res.json(rest);
+    const { __v, _id, ...rest } = student as any;
+    return res.json({ ...rest, id: _id.toString() });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
@@ -98,8 +125,11 @@ export async function updateStudent(req: Request, res: Response) {
       { new: true }
     ).lean();
     if (!updated) return res.status(404).json({ error: 'not found' });
-    const { __v, ...rest } = updated as any;
-    return res.json(rest);
+
+    return res.json({
+      success: true,
+      message: 'Student update successfully',
+    });
   } catch (err: any) {
     // eslint-disable-next-line no-console
     console.error(err);
@@ -116,7 +146,10 @@ export async function deleteStudent(req: Request, res: Response) {
     const removed = await Student.findByIdAndDelete(id).lean();
     if (!removed) return res.status(404).json({ error: 'not found' });
     const { __v, ...rest } = removed as any;
-    return res.json(rest);
+    return res.json({
+      success: true,
+      message: 'Student delete successfully',
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);

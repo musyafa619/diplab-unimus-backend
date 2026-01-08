@@ -30,9 +30,36 @@ async function main() {
     const imageUrl =
       'https://res.cloudinary.com/diwyghl1k/image/upload/v1764832078/lvflmweikmojggbgwphf_e_background_removal_f_png_rwwq6x.png';
     const itemsData = [
-      { name: 'Projector', quantity: 2, imageUrl },
-      { name: 'Laptop', quantity: 5, imageUrl },
-      { name: 'Microphone', quantity: 10, imageUrl },
+      {
+        name: 'Projector',
+        description: 'High-definition projector for presentations and lectures',
+        stock: 2,
+        imageUrl,
+      },
+      {
+        name: 'Laptop',
+        description: 'Dell XPS 15 laptop for development and design work',
+        stock: 5,
+        imageUrl,
+      },
+      {
+        name: 'Microphone',
+        description: 'Condenser microphone for recording and streaming',
+        stock: 10,
+        imageUrl,
+      },
+      {
+        name: 'Whiteboard',
+        description: 'Portable whiteboard for brainstorming and teaching',
+        stock: 3,
+        imageUrl,
+      },
+      {
+        name: 'Camera',
+        description: 'DSLR camera for photography and videography projects',
+        stock: 4,
+        imageUrl,
+      },
     ];
     // If an old unique index on `id` exists from previous schema versions,
     // inserting docs without `id` can trigger duplicate key errors (multiple nulls).
@@ -85,15 +112,43 @@ async function main() {
     const bookingsData = [
       {
         studentId: students[0]._id,
-        items: [items[0]._id, items[2]._id],
-        start_date: now,
-        end_date: tomorrow,
+        items: [
+          {
+            id: items[0]._id,
+            quantity: 1,
+          },
+          {
+            id: items[1]._id,
+            quantity: 1,
+          },
+        ],
+        startDate: now,
+        endDate: tomorrow,
+        status: 'approved' as const,
       },
       {
         studentId: students[1]._id,
-        items: [items[1]._id],
-        start_date: now,
-        end_date: tomorrow,
+        items: [
+          {
+            id: items[2]._id,
+            quantity: 1,
+          },
+        ],
+        startDate: now,
+        endDate: tomorrow,
+        status: 'pending' as const,
+      },
+      {
+        studentId: students[1]._id,
+        items: [
+          {
+            id: items[3]._id,
+            quantity: 1,
+          },
+        ],
+        startDate: now,
+        endDate: tomorrow,
+        status: 'pending' as const,
       },
     ];
     const bookings = await Booking.insertMany(bookingsData as any);
