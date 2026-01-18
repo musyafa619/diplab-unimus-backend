@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import Item from '../models/item';
 import Booking from '../models/booking';
 import Student from '../models/student';
+import { resend } from '../config/resend';
 
 export async function getAvailableItems(req: Request, res: Response) {
   try {
@@ -265,7 +266,7 @@ export async function createBooking(req: Request, res: Response) {
 
       if (requestItem.quantity > availableStock) {
         const itemData = existingItems.find(
-          (i: any) => i._id.toString() === itemId
+          (i: any) => i._id.toString() === itemId,
         );
         return res.status(400).json({
           message: `insufficient stock for ${
@@ -276,7 +277,7 @@ export async function createBooking(req: Request, res: Response) {
     }
 
     // All validations passed, create booking
-    const newBooking = await Booking.create({
+    await Booking.create({
       studentId,
       items,
       startDate: start,
